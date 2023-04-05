@@ -84,9 +84,12 @@ def post(post_slug):
     post_details = Posts.query.filter_by(slug=post_slug).first();
     return render_template('post.html', params=params, post_details=post_details)
 
-@app.route('/login')
+@app.route('/login', methods=["GET","POST"])
 def login():
-    return render_template('login.html', params=params)
+    if request.method=="POST":
+        return render_template('index.html', params=params)
+    else:
+        return render_template('login.html', params=params)
 
 if __name__ == '__main__':
     app.run()
