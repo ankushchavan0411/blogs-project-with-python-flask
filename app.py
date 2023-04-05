@@ -65,7 +65,8 @@ def about():
 
 @app.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html', params=params)
+    post_list = Posts.query.all()
+    return render_template('dashboard.html', params=params, posts=post_list)
 
 @app.route('/contact', methods = ['POST', 'GET'])
 def contact():
@@ -117,7 +118,8 @@ def post_add():
             db.session.add(post_form)
             db.session.commit()
         action_name = 'Add'
-        return render_template('post-add-edit.html', params=params, action_name=action_name, action='/post-add')
+        return render_template('post-add-edit.html', params=params, action_name=action_name, action='/post-add',
+                               post='None')
 
 @app.route('/post-edit/<string:post_id>', methods=['GET', 'POST'])
 def post_edit(post_id):
