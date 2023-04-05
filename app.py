@@ -1,12 +1,31 @@
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from flask_mail import Mail
+import json
 
 
+with open('config.json', 'r') as c:
+    params = json.load(c)['params']
 
+locale_server = True;
 app = Flask(__name__)
-# configure the SQLite database, relative to the app instance folder
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://root:@localhost/cleanblogs"
+# Configuring the email setup to contact forms
+app.config.update(
+    MAIL_SERVER='smtp.gmail.com',
+    MAIL_PORT="465",
+    MAIL_USE_SSL=True,
+    MAIL_USERNAME=params['gmail_username'],
+    MAIL_PASSWORD=params['gmail_password']
+)
+mail = Mail(app)
+
+if(locale_server):
+    # configure the MYSQL database, relative to the app instance folder
+    app.config["SQLALCHEMY_DATABASE_URI"] = params['local_uri']
+else:
+    app.config["SQLALCHEMY_DATABASE_URI"] = params['prod_uri']
+
 # create the extension
 db = SQLAlchemy(app);
 # db.init_app(app)
@@ -22,19 +41,19 @@ class Contacts(db.Model):
 
 @app.route('/')
 def root():  # put application's code here
-    return render_template('index.html')
+    return render_template('index.html', params=params)
 
 @app.route('/home')
 def home():  # put application's code here
-    return render_template('index.html')
+    return render_template('index.html', params=params)
 
 @app.route('/about')
 def about():  # put application's code here
     name = "Ankush Chavan"
-    return render_template('about.html', name=name)
+    return render_template('about.html', name=name, params=params)
 
 @app.route('/contact', methods = ['POST', 'GET'])
-def contact():  # put application's code here
+def contact():
     if request.method == 'POST':
         name = request.form.get("name")
         email = request.form.get("email")
@@ -43,11 +62,17 @@ def contact():  # put application's code here
         entry = Contacts(name=name, email=email, phone=phone, message=message, date=datetime.now())
         db.session.add(entry);
         db.session.commit();
-    # else:
-    return render_template('contact.html')
+        mail.send_message('Blog: New message from' + " " + name,
+                          sender=email,
+                          recipients=[params['gmail_username'], "ankush.neosoft@gmail.com"],
+                          body=message + "\n" + phone
+                          )
+    return render_template('contact.html', params=params)
 
 @app.route('/post')
 def post():  # put application's code here
-    return render_template('post.html')
+    return render_template('post.html', params=params)
+
+
 if __name__ == '__main__':
     app.run()
