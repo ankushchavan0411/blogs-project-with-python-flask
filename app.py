@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_mail import Mail
@@ -8,8 +8,9 @@ import json
 with open('config.json', 'r') as c:
     params = json.load(c)['params']
 
-locale_server = True;
+locale_server = True
 app = Flask(__name__)
+app.secret_key = "super-secret-key"
 # Configuring the email setup to contact forms
 app.config.update(
     MAIL_SERVER='smtp.gmail.com',
@@ -86,10 +87,51 @@ def post(post_slug):
 
 @app.route('/login', methods=["GET","POST"])
 def login():
-    if request.method=="POST":
-        return render_template('index.html', params=params)
-    else:
-        return render_template('login.html', params=params)
+    if 'user' in session and session['user'] == params['admin_username']:
+        post_list = Posts.query.all()
+        return render_template('dashboard.html', params=params, posts=post_list)
+    if request.method == "POST":
+        username = request.form['username']
+        password = request.form['password']
+        if username == params['admin_username'] and password == params['admin_password']:
+            session['user'] = username
+            post_list = Posts.query.all()
+            return render_template('dashboard.html', params=params, posts=post_list)
+    return render_template('login.html', params=params)
+
+@app.route('/post-add', methods=['GET', 'POST'])
+def post_add():
+    if 'user' in session and session['user'] == params['admin_username']:
+        if request.method == 'POST':
+            title = request.form['title']
+            sub_title = request.form['sub_title']
+            posted_by = request.form['posted_by']
+            post_content = request.form['post_content']
+            slug = request.form['slug']
+
+            post_form = Posts(title=title, sub_title=sub_title, post_content=post_content, posted_by=posted_by, slug=slug, posted_at=datetime.now())
+            db.session.add(post_form)
+            db.session.commit()
+        action_name = 'Add'
+        return render_template('post-add-edit.html', params=params, action_name=action_name, action='/post-add')
+
+@app.route('/post-edit/<string:post_id>', methods=['GET', 'POST'])
+def post_edit(post_id):
+    if 'user' in session and session['user'] == params['admin_username']:
+        if request.method == 'POST':
+            title = request.form['title']
+            sub_title = request.form['sub_title']
+            posted_by = request.form['posted_by']
+            post_content = request.form['post_content']
+            slug = request.form['slug']
+            # This is Post Add logic Edit logic need to write
+            if post_id == "0":
+                post_form = Posts(title=title, sub_title=sub_title, post_content=post_content, posted_by=posted_by, slug=slug, posted_at=datetime.now())
+                db.session.add(post_form)
+                db.session.commit()
+        action_name = "Edit"
+        action = '/post-edit/'+post_id
+        return render_template('post-add-edit.html', params=params, action=action, action_name=action_name)
 
 if __name__ == '__main__':
     app.run()

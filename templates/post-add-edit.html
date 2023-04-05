@@ -1,0 +1,61 @@
+       {% extends "layout.html" %}
+        {% block body %}
+        <!-- Page Header-->
+        <header class="masthead" style="background-image: url('{{url_for('static', filename='assets/img/home-bg.jpg')}}')">
+            <div class="container position-relative px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-lg-8 col-xl-7">
+                        <div class="site-heading">
+                            <h1>{{ action_name }} Post</h1>
+                            <span class="subheading">{{ action_name }} your post here</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- Main Content-->
+        <div class="px-4 px-lg-5">
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-md-10 col-lg-8 col-xl-7">
+                    <div class="my-0 mb-5">
+                        <form id="post-edit" action="{{ action }}" method="post" >
+                                <div class="form-floating">
+                                    <input class="form-control" id="title" name="title" type="text" placeholder="Enter post tile..." data-sb-validations="required" />
+                                    <label for="title">Title</label>
+                                    <div class="invalid-feedback" data-sb-feedback="title:required">A title is required.</div>
+                                </div>
+                                <div class="form-floating">
+                                    <input class="form-control" name="sub_title" id="sub_title" type="text" placeholder="Enter post tagline" data-sb-validations="required" />
+                                    <label for="sub_title">Tagline</label>
+                                    <div class="invalid-feedback" data-sb-feedback="sub_title:required">An tagline required.</div>
+                                </div>
+                                <div class="form-floating">
+                                    <input class="form-control" name="posted_by" id="posted_by" type="text" placeholder="Enter posted by" data-sb-validations="required" />
+                                    <label for="posted_by">Posted By</label>
+                                    <div class="invalid-feedback" data-sb-feedback="posted_by:required">An posted by required.</div>
+                                </div>
+                                <div class="form-floating">
+                                    <input class="form-control" name="slug" id="slug" type="text" placeholder="Enter slug by" data-sb-validations="required" />
+                                    <label for="slug">Slug</label>
+                                    <div class="invalid-feedback" data-sb-feedback="slug:required">An slug required.</div>
+                                </div>
+                                <div class="form-floating">
+                                    <textarea class="form-control" name="post_content" id="post_content" placeholder="Enter your post content here..." style="height: 12rem" data-sb-validations="required"></textarea>
+                                    <label for="post_content">Post Content</label>
+                                    <div class="invalid-feedback" data-sb-feedback="post_content:required">A post content is required.</div>
+                                </div>
+                                <br />
+                                <div class="d-none" id="submitSuccessMessage">
+                                    <div class="text-center mb-3">
+                                        <div class="fw-bolder">Post updated successful!</div>
+                                       </div>
+                                </div>
+                                <div class="d-none" id="submitErrorMessage"><div class="text-center text-danger mb-3">Error while editing post!</div></div>
+                                <!-- Submit Button-->
+                                <button class="btn btn-primary text-uppercase" id="submitButton" type="submit">{{ action_name }} post</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}
