@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, redirect
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_mail import Mail
@@ -63,6 +63,10 @@ def about():
     name = "Ankush Chavan"
     return render_template('about.html', name=name, params=params)
 
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html', params=params)
+
 @app.route('/contact', methods = ['POST', 'GET'])
 def contact():
     if request.method == 'POST':
@@ -124,14 +128,25 @@ def post_edit(post_id):
             posted_by = request.form['posted_by']
             post_content = request.form['post_content']
             slug = request.form['slug']
-            # This is Post Add logic Edit logic need to write
-            if post_id == "0":
+            if post_id == 0:
                 post_form = Posts(title=title, sub_title=sub_title, post_content=post_content, posted_by=posted_by, slug=slug, posted_at=datetime.now())
                 db.session.add(post_form)
                 db.session.commit()
+            else:
+                post_form = Posts.query.filter_by(post_id=post_id).first()
+                post_form.title = title
+                post_form.sub_title = sub_title
+                post_form.posted_by = posted_by
+                post_form.post_content = post_content
+                post_form.slug = slug
+                db.session.commit()
+                return redirect('/post-edit/'+post_id)
+
         action_name = "Edit"
         action = '/post-edit/'+post_id
-        return render_template('post-add-edit.html', params=params, action=action, action_name=action_name)
+        post_data = Posts.query.filter_by(post_id=post_id).first()
+        return render_template('post-add-edit.html', params=params, action=action, action_name=action_name,
+                               post=post_data)
 
 if __name__ == '__main__':
     app.run()
