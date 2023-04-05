@@ -51,22 +51,21 @@ class Posts(db.Model):
 @app.route('/')
 def root():
     posts_list = Posts.query.filter_by().all()[0:params['no_of_post']]
-    return render_template('index.html', params=params, posts=posts_list)
-
+    return render_template('index.html', params=params, posts=posts_list, is_auth=session['user'])
 @app.route('/home')
 def home():
     posts_list = Posts.query.filter_by().all()[0:params['no_of_post']]
-    return render_template('index.html', params=params, posts=posts_list)
+    return render_template('index.html', params=params, posts=posts_list, is_auth=session['user'])
 
 @app.route('/about')
 def about():
     name = "Ankush Chavan"
-    return render_template('about.html', name=name, params=params)
+    return render_template('about.html', name=name, params=params, is_auth=session['user'])
 
 @app.route('/dashboard')
 def dashboard():
     post_list = Posts.query.all()
-    return render_template('dashboard.html', params=params, posts=post_list)
+    return render_template('dashboard.html', params=params, posts=post_list, is_auth=session['user'])
 
 @app.route('/contact', methods = ['POST', 'GET'])
 def contact():
@@ -83,12 +82,12 @@ def contact():
                           recipients=[params['gmail_username'], "ankush.neosoft@gmail.com"],
                           body=message + "\n" + phone
                           )
-    return render_template('contact.html', params=params)
+    return render_template('contact.html', params=params, is_auth=session['user'])
 
 @app.route("/post/<string:post_slug>", methods=['GET'])
 def post(post_slug):
     post_details = Posts.query.filter_by(slug=post_slug).first();
-    return render_template('post.html', params=params, post_details=post_details)
+    return render_template('post.html', params=params, post_details=post_details, is_auth=session['user'])
 
 @app.route('/login', methods=["GET","POST"])
 def login():
@@ -99,9 +98,8 @@ def login():
         password = request.form['password']
         if username == params['admin_username'] and password == params['admin_password']:
             session['user'] = username
-            post_list = Posts.query.all()
-            return render_template('dashboard.html', params=params, posts=post_list)
-    return render_template('login.html', params=params)
+            return redirect('/dashboard')
+    return render_template('login.html', params=params, is_auth=session['user'])
 
 @app.route('/post-add', methods=['GET', 'POST'])
 def post_add():
@@ -118,7 +116,7 @@ def post_add():
             db.session.commit()
         action_name = 'Add'
         return render_template('post-add-edit.html', params=params, action_name=action_name, action='/post-add',
-                               post='None')
+                               post='None', is_auth=session['user'])
 
 @app.route('/post-edit/<string:post_id>', methods=['GET', 'POST'])
 def post_edit(post_id):
@@ -147,7 +145,7 @@ def post_edit(post_id):
         action = '/post-edit/'+post_id
         post_data = Posts.query.filter_by(post_id=post_id).first()
         return render_template('post-add-edit.html', params=params, action=action, action_name=action_name,
-                               post=post_data)
+                               post=post_data, is_auth=session['user'])
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
