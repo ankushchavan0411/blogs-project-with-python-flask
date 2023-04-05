@@ -38,6 +38,14 @@ class Contacts(db.Model):
     phone = db.Column(db.String(120), nullable=False)
     message = db.Column(db.String(120), nullable=False)
     date = db.Column(db.String(12))
+class Posts(db.Model):
+    post_id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), unique=False, nullable=False)
+    sub_title = db.Column(db.String(100), nullable=False)
+    posted_by = db.Column(db.String(20), nullable=False)
+    posted_at = db.Column(db.String(12), nullable=False)
+    post_content = db.Column(db.String(500), nullable=False)
+    slug = db.Column(db.String(25), unique=False, nullable=False)
 
 @app.route('/')
 def root():  # put application's code here
@@ -69,10 +77,10 @@ def contact():
                           )
     return render_template('contact.html', params=params)
 
-@app.route('/post')
-def post():  # put application's code here
-    return render_template('post.html', params=params)
-
+@app.route("/post/<string:post_slug>", methods=['GET'])
+def post(post_slug):
+    post_details = Posts.query.filter_by(slug=post_slug).first();
+    return render_template('post.html', params=params, post_details=post_details)
 
 if __name__ == '__main__':
     app.run()
