@@ -93,8 +93,7 @@ def post(post_slug):
 @app.route('/login', methods=["GET","POST"])
 def login():
     if 'user' in session and session['user'] == params['admin_username']:
-        post_list = Posts.query.all()
-        return render_template('dashboard.html', params=params, posts=post_list)
+        return redirect('/dashboard')
     if request.method == "POST":
         username = request.form['username']
         password = request.form['password']
@@ -149,6 +148,12 @@ def post_edit(post_id):
         post_data = Posts.query.filter_by(post_id=post_id).first()
         return render_template('post-add-edit.html', params=params, action=action, action_name=action_name,
                                post=post_data)
+
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    if 'user' in session and session['user'] == params['admin_username']:
+        session['user'] = None
+    return redirect('/login')
 
 if __name__ == '__main__':
     app.run()
