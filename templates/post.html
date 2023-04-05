@@ -13,7 +13,7 @@
                                 Posted by
                                 <a href="#!">{{ post_details.posted_by }}</a>
 {#                                on August 24, 2023#}
-                                on {{ post_details.posted_at }}
+                                on {{ post_details.posted_at.strftime('%b-%d-%Y') }}
                             </span>
                         </div>
                     </div>

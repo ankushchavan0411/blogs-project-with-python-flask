@@ -48,15 +48,17 @@ class Posts(db.Model):
     slug = db.Column(db.String(25), unique=False, nullable=False)
 
 @app.route('/')
-def root():  # put application's code here
-    return render_template('index.html', params=params)
+def root():
+    posts_list = Posts.query.filter_by().all()
+    return render_template('index.html', params=params, posts=posts_list)
 
 @app.route('/home')
-def home():  # put application's code here
-    return render_template('index.html', params=params)
+def home():
+    posts_list = Posts.query.filter_by().all()
+    return render_template('index.html', params=params, posts=posts_list)
 
 @app.route('/about')
-def about():  # put application's code here
+def about():
     name = "Ankush Chavan"
     return render_template('about.html', name=name, params=params)
 
