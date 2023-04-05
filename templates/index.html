@@ -24,9 +24,9 @@
                                 <h2 class="post-title">{{ post.title }}</h2>
                                 <h3 class="post-subtitle">{{ post.sub_title }}</h3>
                             </a>
-                            <p class="post">
+                            <div>
                                 {{ post.post_content[0:75] }}...
-                            </p>
+                            </div>
                             <p class="post-meta">
                                 Posted by
                                 <a href="/post/{{ post.slug }}">{{ post.posted_by }}</a>

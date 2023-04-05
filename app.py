@@ -49,12 +49,12 @@ class Posts(db.Model):
 
 @app.route('/')
 def root():
-    posts_list = Posts.query.filter_by().all()
+    posts_list = Posts.query.filter_by().all()[0:params['no_of_post']]
     return render_template('index.html', params=params, posts=posts_list)
 
 @app.route('/home')
 def home():
-    posts_list = Posts.query.filter_by().all()
+    posts_list = Posts.query.filter_by().all()[0:params['no_of_post']]
     return render_template('index.html', params=params, posts=posts_list)
 
 @app.route('/about')
@@ -83,6 +83,10 @@ def contact():
 def post(post_slug):
     post_details = Posts.query.filter_by(slug=post_slug).first();
     return render_template('post.html', params=params, post_details=post_details)
+
+@app.route('/login')
+def login():
+    return render_template('login.html', params=params)
 
 if __name__ == '__main__':
     app.run()
