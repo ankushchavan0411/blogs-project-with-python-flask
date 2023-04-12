@@ -1,8 +1,12 @@
-from flask import Flask, render_template, request, session, redirect
+from flask import Flask, render_template, request, session, redirect, flash, url_for
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.utils import secure_filename
 from datetime import datetime
 from flask_mail import Mail
 import json
+import os
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 
 with open('config.json', 'r') as c:
@@ -11,6 +15,7 @@ with open('config.json', 'r') as c:
 locale_server = True
 app = Flask(__name__)
 app.secret_key = "super-secret-key"
+app.config['UPLOAD_FOLDER'] = params['upload_location']
 # Configuring the email setup to contact forms
 app.config.update(
     MAIL_SERVER='smtp.gmail.com',
@@ -64,8 +69,11 @@ def about():
 
 @app.route('/dashboard')
 def dashboard():
-    post_list = Posts.query.all()
-    return render_template('dashboard.html', params=params, posts=post_list, is_auth=session['user'])
+    if 'user' in session and session['user'] == params['admin_username']:
+        post_list = Posts.query.all()
+        return render_template( 'dashboard.html', params=params, posts=post_list, is_auth=session['user'])
+    return redirect('/login')
+
 
 @app.route('/contact', methods = ['POST', 'GET'])
 def contact():
@@ -147,10 +155,34 @@ def post_edit(post_id):
         return render_template('post-add-edit.html', params=params, action=action, action_name=action_name,
                                post=post_data, is_auth=session['user'])
 
-@app.route('/logout', methods=['GET', 'POST'])
+@app.route('/logout')
 def logout():
     if 'user' in session and session['user'] == params['admin_username']:
         session['user'] = None
+    return redirect('/login')
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/uploader', methods=['GET', 'POST'])
+def uploader():
+    if 'user' in session and session['user'] == params['admin_username']:
+        if request.method == 'POST':
+            # check if the post request has the file part
+            if 'file' not in request.files:
+                flash('No file part')
+                return redirect(request.url)
+            file = request.files['file']
+            # If the user does not select a file, the browser submits an
+            # empty file without a filename.
+            if file.filename == '':
+                flash('No selected file')
+                return redirect(request.url)
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                return "file uploaded successfully"
     return redirect('/login')
 
 if __name__ == '__main__':
