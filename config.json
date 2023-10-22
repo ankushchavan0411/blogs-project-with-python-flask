@@ -1,0 +1,21 @@
+{
+"params": {
+ "local_server": "True",
+  "local_uri": "mysql://root:@localhost/cleanblogs",
+  "prod_uri": "mysql://admin:passord@localhost/cleanblogs",
+ "facebook_url": "https://facebook.com",
+ "github_url": "https://github.com",
+ "twitter_url": "https://twitter.com",
+ "blog_name": "Coding Thunder",
+ "tag_line": "A Blog Liked by Programmers",
+ "gmail_username": "ac.infostretch@gmail.com",
+ "gmail_password": "wmmqfbshwftiikiy",
+ "about_text": " Senior Engineer at Apexon | React JS | Next JS | Redux | JavaScript & Typescript | Formik | Sentry | Jest & Enzyme | Keyclock | Docker | Git & Bitbucket | Jenkins | AWS | Azure | CICD | Google Analytics. I'm a React JS developer with 4 years of experience looking to create usable, useful, and well-designed websites and applications using React JS, Next JS, Redux, Jest, and Git. I'm looking forward to continuing to learn and collaborate with wonderful people.",
+ "no_of_post": 5,
+ "admin_username": "admin@blog.com",
+ "admin_password": "admin",
+ "upload_location": "C:\\Users\\DELL\\PycharmProjects\\flaskProject\\static"
+}
+
+}
+
